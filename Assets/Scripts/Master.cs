@@ -3,64 +3,87 @@ using System.Collections;
 using System.Collections.Generic;
 public class Master : MonoBehaviour {
 
-
+    //max l. kropek 100;
    // public int signalNoiseRatio;
     public GameObject dotPrefab;
     public List<GameObject> Reds = new List<GameObject>();
     public List<GameObject> Blues = new List<GameObject>();
     public GameObject[] BackGround;
+    public int redDots;
+    public int blueDots;
+
+
 	// Use this for initialization
 	void Start () {
-        InstantiateDots();
-        SetColors();
+       InstantiateRedDots(20);
+       InstantiateBlueDots(20);
+       SetRedsColor(Colors.RED);
+       SetBluesColor(Colors.BLUE);
+       SetBackgroundColor(Colors.BACKGROUDND);
+       setBluesAsSignal();
 	}
-
     //red is left, blue is right
-    void InstantiateDots()
+    void InstantiateRedDots(int no)
     {
-        for (int i = 0; i < Settings.instance.redDots + Settings.instance.blueDots; i++)
+        for (int i = 0; i < no; i++)
         {
-            GameObject tmp = (GameObject)Instantiate(dotPrefab, Settings.instance.GetValidPosition(), transform.rotation);
-            if (i < Settings.instance.redDots)
-            {
-                Reds.Add(tmp);
-                if (Settings.instance.GetEye() == Eye.Right)
-                {
-                    setUpDotParams(tmp, true);
-                }
-            }
-            else
-            {
-                Blues.Add(tmp);
-                if (Settings.instance.GetEye() == Eye.Left)
-                {
-                    setUpDotParams(tmp, true);
-                }
-            }
-            
+            GameObject tmp = CreateDot();
+            Reds.Add(tmp);                 
         }
     }
 
-    void setUpDotParams(GameObject dot, bool sigDot)
+    void InstantiateBlueDots(int no)
     {
-        dot.transform.position = new Vector3(dot.transform.position.x, dot.transform.position.y, 3);
-        dot.GetComponent<RandomMovement>().isSignalDot = sigDot;
+        for (int i = 0; i < no; i++)
+        {
+            GameObject tmp = CreateDot();
+            Blues.Add(tmp);
+        }
     }
 
-    void SetColors()
+    GameObject CreateDot()
+    {
+        return (GameObject)Instantiate(dotPrefab, Settings.instance.GetValidPosition(), transform.rotation);
+    }
+
+    void setRedsAsSignal()
+    {
+        foreach(GameObject dot in Reds)
+        dot.GetComponent<RandomMovement>().isSignalDot = true;
+    }
+
+    void setBluesAsSignal()
+    {
+        foreach (GameObject dot in Blues)
+            dot.GetComponent<RandomMovement>().isSignalDot = true;
+    }
+
+    void SetRedsColor(Color col)
     {
         foreach (GameObject x in Reds)
         {
-            x.GetComponent<SpriteRenderer>().color = Colors.RED;
+            x.GetComponent<SpriteRenderer>().color = col;
         }
+    }
+
+    void SetBluesColor(Color col)
+    {
         foreach (GameObject x in Blues)
         {
-            x.GetComponent<SpriteRenderer>().color = Colors.BLUE;
+            x.GetComponent<SpriteRenderer>().color = col;
         }
+    }
+    void SetBackgroundColor(Color col)
+    {
         foreach (GameObject x in BackGround)
         {
-            x.GetComponent<SpriteRenderer>().color = Colors.BACKGROUDND;
+            x.GetComponent<SpriteRenderer>().color = col;
         }
+    }
+    void SetAllDotColor(Color col)
+    {
+        SetBluesColor(col);
+        SetRedsColor(col);
     }
 }
 

@@ -7,8 +7,6 @@ public class Settings : MonoBehaviour {
     public static string WHICH_EYE = "WHICH_EYE";
     public static string CONTRAST = "CONTRAST";
     public Eye ambylopicEye = Eye.Left;
-    public int redDots;
-    public int blueDots;
     private float contrast = 0;
     public static Settings instance = null;
     public  Transform leftGuard;
@@ -16,7 +14,7 @@ public class Settings : MonoBehaviour {
     public  Transform topGuard;
     public  Transform bottomGuard;
  //   public int movementDistanceFactor;
-    public float signalMoveDistance=4;
+    public float signalMoveDistance=2;
     private Direction direction;
     public bool tmp;
     void Awake()
@@ -65,9 +63,7 @@ public class Settings : MonoBehaviour {
         float ylen = GetYlen();
         float x = Random.value * xlen - xlen / 2;
         float y = Random.value*ylen-ylen/2;
-     //   x /= movementDistanceFactor;
-     //   y /= movementDistanceFactor;
-        return new Vector3(x, y, 0);
+        return new Vector3(x+transform.position.x, y+transform.position.y, 0);
     }
     public Eye GetEye()
     {
