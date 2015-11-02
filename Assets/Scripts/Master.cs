@@ -15,8 +15,8 @@ public class Master : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-       InstantiateRedDots(20);
-       InstantiateBlueDots(20);
+        InstantiateRedDots(redDots);
+        InstantiateBlueDots(blueDots);
        SetRedsColor(Colors.RED);
        SetBluesColor(Colors.BLUE);
        SetBackgroundColor(Colors.BACKGROUDND);

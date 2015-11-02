@@ -30,22 +30,26 @@ public class RandomMovement : MonoBehaviour {
 
     void SetUpJourney(Vector3 lastpos)
     {
+        float dist = Settings.instance.signalMoveDistance;
         if (!isSignalDot) {
         lastPosition = Settings.instance.GetValidPosition();
         nextPosition = Settings.instance.GetValidPosition();
         }
         else
         {
-            transform.position = Settings.instance.GetValidPosition();
-            lastPosition = transform.position;
-            nextPosition = transform.position;
+            Vector3 trans = new Vector3();
+            trans = Settings.instance.GetValidPosition();
+            lastPosition = trans;
+            nextPosition = trans;
             switch (Settings.instance.GetDirection())
             {
                 case Direction.Left:
-                    nextPosition.x = nextPosition.x - Settings.instance.signalMoveDistance;
+                    lastPosition.x += dist / 2;
+                    nextPosition.x = nextPosition.x - dist/2;
                     break;
                 case Direction.Right:
-                    nextPosition.x = nextPosition.x + Settings.instance.signalMoveDistance;
+                    lastPosition.x -= dist / 2;
+                    nextPosition.x = nextPosition.x + dist/2;
                     break;
             }
         }
