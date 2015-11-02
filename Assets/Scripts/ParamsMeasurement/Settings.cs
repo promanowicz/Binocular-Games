@@ -60,14 +60,8 @@ public class Settings : MonoBehaviour {
     }
     public Vector3 GetValidPosition()
     {
-        float xlen = GetXlen();
-        float ylen = GetYlen();
-        float x = Random.value * xlen - xlen / 2;
-        float y = Random.value*ylen-ylen/2;
         Vector3 vec2 = camera.ViewportToWorldPoint(new Vector3(Random.value,Random.value,0));
         vec2 = new Vector3(vec2.x, vec2.y, 0);
-        //return new Vector3(x+transform.position.x, y+transform.position.y, 0);
-        Debug.Log("" + vec2.ToString());
         return vec2;
     }
     public Eye GetEye()

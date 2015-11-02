@@ -44,12 +44,12 @@ public class RandomMovement : MonoBehaviour {
             switch (Settings.instance.GetDirection())
             {
                 case Direction.Left:
-                    lastPosition.x += dist / 2;
-                    nextPosition.x = nextPosition.x - dist/2;
+                    lastPosition.x += dist ;
+                    nextPosition.x = nextPosition.x - dist;
                     break;
                 case Direction.Right:
-                    lastPosition.x -= dist / 2;
-                    nextPosition.x = nextPosition.x + dist/2;
+                    lastPosition.x -= dist ;
+                    nextPosition.x = nextPosition.x + dist;
                     break;
             }
         }

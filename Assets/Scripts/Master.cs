@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+public enum GameType {TresholdMeasurement,ContrastMeasurement}
 public class Master : MonoBehaviour {
 
     //max l. kropek 100;
    // public int signalNoiseRatio;
+    public GameType gameType;
     public GameObject dotPrefab;
     public List<GameObject> Reds = new List<GameObject>();
     public List<GameObject> Blues = new List<GameObject>();
@@ -31,7 +33,10 @@ public class Master : MonoBehaviour {
             Reds.Add(tmp);                 
         }
     }
-
+    public void randDirection()
+    {
+        Settings.instance.RandDir();
+    }
     void InstantiateBlueDots(int no)
     {
         for (int i = 0; i < no; i++)
