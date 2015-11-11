@@ -4,29 +4,31 @@ using System.Collections.Generic;
 
 //public enum GameType { TresholdMeasurement,ContrastMeasurement}
 
-public class GameMaster : MonoBehaviour {
+public class GameMaster : MonoBehaviour
+{
     public GameType gameType;
     public GameObject dotPrefab;
     public List<GameObject> redDots = new List<GameObject>();
     public List<GameObject> blueDots = new List<GameObject>();
     private List<int> measurementsRed = new List<int>();
     public GameObject[] BackGround;
-    public int redDotsNubmer =50;
-    public int blueDotsNumber=50;
+    public int redDotsNubmer = 50;
+    public int blueDotsNumber = 50;
     private int positiveAnswers = 0;
     public float contrastIncFactor;
     public int tresholdIncFactor;
     public float timer = 300;
     public float timerResetValue = 180;
     public float resetTime = 10;
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         if (gameType == GameType.ContrastMeasurement)
         {
             RestoreValues();
         }
         setUpGame();
-	}
+    }
 
     bool isAdded = false;
     void Update()
@@ -35,25 +37,37 @@ public class GameMaster : MonoBehaviour {
 
         if (timer <= 0)
         {
-            if (!isAdded) {
-                isAdded = true;
-                 measurementsRed.Add(redDots.Count);
-            }
-            if (measurementsRed.Count >= 5 )
+            if (gameType == GameType.TresholdMeasurement)
             {
-                Settings.instance.RedDotsNumber = average(measurementsRed);
-                Settings.instance.SavePlayerPrefs();
-                Debug.Log("NEW SCENE");
-                //TODO: load new scene
+                if (!isAdded)
+                {
+                    isAdded = true;
+                    measurementsRed.Add(redDots.Count);
+                }
+                if (measurementsRed.Count >= 5)
+                {
+                    Settings.instance.RedDotsNumber = average(measurementsRed);
+                    Settings.instance.SavePlayerPrefs();
+                    Debug.Log("Load contrast measurement");
+                    //TODO: load contrast measurement scene
+                }
+                DeleteAllDots();
+                redDotsNubmer = 50;
+                blueDotsNumber = 50;
+                //monit o resetowaniu gry
+                if (timer < -resetTime)
+                {
+                    isAdded = false;
+                    setUpGame();
+                    timer = timerResetValue;
+                }
             }
-            DeleteAllDots();
-            redDotsNubmer = 50;
-            blueDotsNumber = 50;
-            //monit o resetowaniu gry
-            if (timer < -resetTime) {
-                isAdded = false;
-               setUpGame();
-               timer = timerResetValue;
+            else if (gameType == GameType.ContrastMeasurement)
+            {
+                Settings.instance.RedDotColor = redDots[0].GetComponent<SpriteRenderer>().color.g;
+                Settings.instance.BlueDotColor = blueDots[0].GetComponent<SpriteRenderer>().color.r;
+                Debug.Log("NEW SCENE");
+                //TODO load game choose scene
             }
         }
     }
@@ -68,7 +82,9 @@ public class GameMaster : MonoBehaviour {
 
     void RestoreValues()
     {
-
+        Settings.instance.RestorePrefs();
+        redDotsNubmer = Settings.instance.RedDotsNumber;
+        blueDotsNumber = 100 - redDotsNubmer;
     }
 
     void setUpGame()
@@ -112,7 +128,7 @@ public class GameMaster : MonoBehaviour {
             if (positiveAnswers % 3 == 0)
             {
                 positiveAnswers = 0;
-                for (int i = 0; i < tresholdIncFactor;i++)
+                for (int i = 0; i < tresholdIncFactor; i++)
                     IncreaseDifficuly();
             }
         }
@@ -120,7 +136,7 @@ public class GameMaster : MonoBehaviour {
         {
             positiveAnswers = 0;
             for (int i = 0; i < tresholdIncFactor; i++)
-            DecreaseDifficuly();
+                DecreaseDifficuly();
         }
         Settings.instance.RandDir();
         updateNumbers();
@@ -136,7 +152,7 @@ public class GameMaster : MonoBehaviour {
             }
             else
             {
-                redDotToBlues(false); 
+                redDotToBlues(false);
             }
         }
         if (Settings.instance.ambylopicEye == Eye.Left)
@@ -163,7 +179,7 @@ public class GameMaster : MonoBehaviour {
             else
             {
                 redDotToBlues(true);
-            }     
+            }
         }
         if (Settings.instance.ambylopicEye == Eye.Left)
         {
@@ -192,7 +208,7 @@ public class GameMaster : MonoBehaviour {
         GameObject movingDot = from[0];
         from.RemoveAt(0);
         to.Add(movingDot);
-       // movingDot.GetComponent<SpriteRenderer>().color = to[0].GetComponent<SpriteRenderer>().color;
+        // movingDot.GetComponent<SpriteRenderer>().color = to[0].GetComponent<SpriteRenderer>().color;
         movingDot.GetComponent<RandomMovement>().isSignalDot = willBeSignalDot;
     }
 
@@ -226,7 +242,7 @@ public class GameMaster : MonoBehaviour {
 
     GameObject CreateDot()
     {
-       return (GameObject)Instantiate(dotPrefab, Settings.instance.GetValidPosition(), transform.rotation);
+        return (GameObject)Instantiate(dotPrefab, Settings.instance.GetValidPosition(), transform.rotation);
     }
 
     void setRedsAsSignal()
@@ -271,17 +287,17 @@ public class GameMaster : MonoBehaviour {
 
     void DeleteAllDots()
     {
-            foreach (GameObject tmp in redDots)
-            {
-                Destroy(tmp);
-            }
-            foreach (GameObject tmp in blueDots)
-            {
-                Destroy(tmp);
-            }
+        foreach (GameObject tmp in redDots)
+        {
+            Destroy(tmp);
+        }
+        foreach (GameObject tmp in blueDots)
+        {
+            Destroy(tmp);
+        }
 
-            redDots.Clear();
-            blueDots.Clear();
+        redDots.Clear();
+        blueDots.Clear();
     }
 }
 

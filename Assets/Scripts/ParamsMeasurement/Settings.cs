@@ -4,26 +4,40 @@ public enum Eye { Left, Right};
 public enum Direction { Left, Right, Up, Down, };
 
 public class Settings : MonoBehaviour {
-    public static string WHICH_EYE = "WHICH_EYE";
-    public static string CONTRAST = "CONTRAST";
-    public static string BLUE_DOTS_NUMBER = "BLUE_DOTS_NUMBER";
-    public static string RED_DOTS_NUMBER = "RED_DOTS_NUMBER";
+    public static readonly string WHICH_EYE = "WHICH_EYE";
+    public static readonly string RED_DOT_COLOR = "RED_DOT_COLOR";
+    public static readonly string BLUE_DOT_COLOR = "BLUE_DOT_COLOR";
+    public static readonly string BLUE_DOTS_NUMBER = "BLUE_DOTS_NUMBER";
+    public static readonly string RED_DOTS_NUMBER = "RED_DOTS_NUMBER";
     public Eye ambylopicEye = Eye.Left;
     private float contrast = 0;
-    private int redDotsNumber = 50;
     public float signalMoveDistance = 2;
+
+    private int redDotsNumber = 50;
     public int RedDotsNumber
     {
         get { return redDotsNumber; }
         set { redDotsNumber = value; }
     }
     private int blueDotsNumber = 50;
-
     public int BlueDotsNumber
     {
         get { return blueDotsNumber; }
         set { blueDotsNumber = value; }
     }
+    private float redDotColor;
+    public float RedDotColor
+    {
+        get { return redDotColor; }
+        set { redDotColor = value; }
+    }
+    private float blueDotColor;
+    public float BlueDotColor
+    {
+        get { return blueDotColor; }
+        set { blueDotColor = value; }
+    }
+
     public Camera camera;
     public static Settings instance = null;
 
@@ -49,9 +63,11 @@ public class Settings : MonoBehaviour {
     public void SavePlayerPrefs()
     {
         PlayerPrefs.SetInt(WHICH_EYE, (int)ambylopicEye);
-        PlayerPrefs.SetFloat(CONTRAST, contrast);
+        PlayerPrefs.SetFloat(BLUE_DOT_COLOR, blueDotColor);
+        PlayerPrefs.SetFloat(RED_DOT_COLOR, redDotColor);
         PlayerPrefs.SetInt(BLUE_DOTS_NUMBER, blueDotsNumber);
         PlayerPrefs.SetInt(RED_DOTS_NUMBER, redDotsNumber);
+        PlayerPrefs.Save();
     }
     public void RestorePrefs()
     {
@@ -59,9 +75,21 @@ public class Settings : MonoBehaviour {
         {
             ambylopicEye = (Eye)PlayerPrefs.GetInt(WHICH_EYE);
         }
-        if (PlayerPrefs.HasKey(CONTRAST))
+        if (PlayerPrefs.HasKey(RED_DOT_COLOR))
         {
-            contrast = PlayerPrefs.GetFloat(CONTRAST);
+            redDotColor = PlayerPrefs.GetFloat(RED_DOT_COLOR);
+        }
+        if (PlayerPrefs.HasKey(BLUE_DOT_COLOR))
+        {
+            blueDotColor = PlayerPrefs.GetFloat(BLUE_DOT_COLOR);
+        }
+        if (PlayerPrefs.HasKey(RED_DOTS_NUMBER))
+        {
+           RedDotsNumber = PlayerPrefs.GetInt(RED_DOTS_NUMBER);
+        }
+        if (PlayerPrefs.HasKey(BLUE_DOT_COLOR))
+        {
+            BlueDotsNumber = PlayerPrefs.GetInt(BLUE_DOT_COLOR);
         }
     }
     public Vector3 GetValidPosition()
