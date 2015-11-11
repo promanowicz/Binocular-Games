@@ -1,21 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
-public enum Eye { Left, Right };
+public enum Eye { Left, Right};
 public enum Direction { Left, Right, Up, Down, };
 
 public class Settings : MonoBehaviour {
     public static string WHICH_EYE = "WHICH_EYE";
     public static string CONTRAST = "CONTRAST";
+    public static string BLUE_DOTS_NUMBER = "BLUE_DOTS_NUMBER";
+    public static string RED_DOTS_NUMBER = "RED_DOTS_NUMBER";
     public Eye ambylopicEye = Eye.Left;
     private float contrast = 0;
+    private int redDotsNumber = 50;
+    public float signalMoveDistance = 2;
+    public int RedDotsNumber
+    {
+        get { return redDotsNumber; }
+        set { redDotsNumber = value; }
+    }
+    private int blueDotsNumber = 50;
+
+    public int BlueDotsNumber
+    {
+        get { return blueDotsNumber; }
+        set { blueDotsNumber = value; }
+    }
     public Camera camera;
     public static Settings instance = null;
-    public  Transform leftGuard;
-    public  Transform rightGuard;
-    public  Transform topGuard;
-    public  Transform bottomGuard;
- //   public int movementDistanceFactor;
-    public float signalMoveDistance=2;
+
+
     private Direction direction;
     public bool tmp;
     void Awake()
@@ -38,6 +50,8 @@ public class Settings : MonoBehaviour {
     {
         PlayerPrefs.SetInt(WHICH_EYE, (int)ambylopicEye);
         PlayerPrefs.SetFloat(CONTRAST, contrast);
+        PlayerPrefs.SetInt(BLUE_DOTS_NUMBER, blueDotsNumber);
+        PlayerPrefs.SetInt(RED_DOTS_NUMBER, redDotsNumber);
     }
     void RestorePrefs()
     {
@@ -50,20 +64,24 @@ public class Settings : MonoBehaviour {
             contrast = PlayerPrefs.GetFloat(CONTRAST);
         }
     }
-    public float GetXlen()
-    {
-        return Mathf.Abs(rightGuard.transform.position.x - leftGuard.transform.position.x);
-    }
-    public float GetYlen()
-    {
-        return Mathf.Abs(topGuard.transform.position.y - bottomGuard.transform.position.y);
-    }
     public Vector3 GetValidPosition()
     {
-        Vector3 vec2 = camera.ViewportToWorldPoint(new Vector3(Random.value,Random.value,0));
+        float x = Random.Range(0.05f, 0.95f);
+        float y = Random.Range(0.05f, 0.95f);
+        Vector3 vec2 = camera.ViewportToWorldPoint(new Vector3(x,y));
         vec2 = new Vector3(vec2.x, vec2.y, 0);
         return vec2;
     }
+
+    public Vector3 GetShorterValidPosition()
+    {
+        float x = Random.Range(0.15f, 0.85f);
+        float y = Random.Range(0.15f, 0.85f);
+        Vector3 vec2 = camera.ViewportToWorldPoint(new Vector3(x, y));
+        vec2 = new Vector3(vec2.x, vec2.y, 0);
+        return vec2;
+    }
+
     public Eye GetEye()
     {
         return ambylopicEye;
@@ -76,16 +94,5 @@ public class Settings : MonoBehaviour {
     {
         return contrast;
     }
-	// Use this for initialization
-	void Start () {
-	
-	}
-	// Update is called once per frame
-	void Update () {
-        if (tmp)
-        {
-            Debug.Log("Kierunek: " + RandDir().ToString());
-        }
-	}
 }
 

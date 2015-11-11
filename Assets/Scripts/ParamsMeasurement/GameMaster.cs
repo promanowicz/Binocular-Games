@@ -9,12 +9,47 @@ public class GameMaster : MonoBehaviour {
     public GameObject dotPrefab;
     public List<GameObject> redDots = new List<GameObject>();
     public List<GameObject> blueDots = new List<GameObject>();
+    private List<int> measuremens = new List<int>();
     public GameObject[] BackGround;
-    public int redDotsNubmer;
-    public int blueDotsNumber;
+    public int redDotsNubmer =50;
+    public int blueDotsNumber=50;
     private int positiveAnswers = 0;
+    public float contrastIncFactor;
+    public int tresholdIncFactor;
+    public float timer = 300;
+    public float timerReset = 300;
 	// Use this for initialization
 	void Start () {
+        redDotsNubmer =50;
+        blueDotsNumber=50;
+        if (gameType == GameType.ContrastMeasurement)
+        {
+            RestoreValues();
+        }
+        setUpGame();
+	}
+
+    void Update()
+    {
+        timer -= Time.deltaTime;
+
+        if (timer <= 0)
+        {
+            //destroy objects
+            setUpGame();
+            timer = timerReset;
+        }
+        //TODO: Timer 3 minutowy na sesję pobierania progu
+        //TODO: 5 sesji z których średnia jest podstawą do pomiaru kontrastu
+    }
+
+    void RestoreValues()
+    {
+
+    }
+
+    void setUpGame()
+    {
         InstantiateRedDots(redDotsNubmer);
         InstantiateBlueDots(blueDotsNumber);
         SetBackgroundColor(Colors.BACKGROUDND);
@@ -22,7 +57,6 @@ public class GameMaster : MonoBehaviour {
         {
             SetRedsColor(Colors.RED);
             SetBluesColor(Colors.BLUE);
-            
         }
         if (gameType == GameType.TresholdMeasurement)
         {
@@ -31,14 +65,21 @@ public class GameMaster : MonoBehaviour {
         }
         if (Settings.instance.ambylopicEye == Eye.Right)
         {
-            setBluesAsSignal();
+            setRedsAsSignal();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetBluesColor(Colors.BACKGROUDND);
+            }
         }
         if (Settings.instance.ambylopicEye == Eye.Left)
         {
             setBluesAsSignal();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetRedsColor(Colors.BACKGROUDND);
+            }
         }
-	}
-
+    }
     public void dirButtonClicked(int dir)
     {
         Direction choosenDir = (Direction)dir;
@@ -48,26 +89,43 @@ public class GameMaster : MonoBehaviour {
             if (positiveAnswers % 3 == 0)
             {
                 positiveAnswers = 0;
-                IncreaseDifficuly();
+                for (int i = 0; i < tresholdIncFactor;i++)
+                    IncreaseDifficuly();
             }
         }
         else
         {
             positiveAnswers = 0;
+            for (int i = 0; i < tresholdIncFactor; i++)
             DecreaseDifficuly();
         }
         Settings.instance.RandDir();
         updateNumbers();
     }
+
     private void IncreaseDifficuly()
     {
         if (Settings.instance.ambylopicEye == Eye.Right)
         {
-            blueDotToReds();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetBluesColor(Colors.IncreaseDotLuminance(blueDots[0].GetComponent<SpriteRenderer>().color, contrastIncFactor, false));
+            }
+            else
+            {
+                redDotToBlues(false); 
+            }
         }
         if (Settings.instance.ambylopicEye == Eye.Left)
         {
-            redDotToBlues();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetRedsColor(Colors.IncreaseDotLuminance(redDots[0].GetComponent<SpriteRenderer>().color, contrastIncFactor, true));
+            }
+            else
+            {
+                blueDotToReds(false);
+            }
         }
     }
 
@@ -75,27 +133,46 @@ public class GameMaster : MonoBehaviour {
     {
         if (Settings.instance.ambylopicEye == Eye.Right)
         {
-            redDotToBlues();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetBluesColor(Colors.DecreaseDotLuminance(blueDots[0].GetComponent<SpriteRenderer>().color, contrastIncFactor, false));
+            }
+            else
+            {
+                redDotToBlues(true);
+            }     
         }
         if (Settings.instance.ambylopicEye == Eye.Left)
         {
-            blueDotToReds();
+            if (gameType == GameType.ContrastMeasurement)
+            {
+                SetRedsColor(Colors.DecreaseDotLuminance(redDots[0].GetComponent<SpriteRenderer>().color, contrastIncFactor, true));
+            }
+            else
+            {
+                blueDotToReds(true);
+            }
         }
     }
-    private void redDotToBlues()
+
+    private void redDotToBlues(bool willBeSignalDot)
     {
-        GameObject movingDot = redDots[0];
-        redDots.RemoveAt(0);
-        blueDots.Add(movingDot);
-        movingDot.GetComponent<SpriteRenderer>().color = redDots[0].GetComponent<SpriteRenderer>().color;
+        switchDot(redDots, blueDots, willBeSignalDot);
     }
-    private void blueDotToReds()
+    private void blueDotToReds(bool willBeSignalDot)
     {
-        GameObject movingDot = blueDots[0];
-        blueDots.RemoveAt(0);
-        redDots.Add(movingDot);
-        movingDot.GetComponent<SpriteRenderer>().color = blueDots[0].GetComponent<SpriteRenderer>().color;
+        switchDot(blueDots, redDots, willBeSignalDot);
     }
+
+    private void switchDot(List<GameObject> from, List<GameObject> to, bool willBeSignalDot)
+    {
+        GameObject movingDot = from[0];
+        from.RemoveAt(0);
+        to.Add(movingDot);
+       // movingDot.GetComponent<SpriteRenderer>().color = to[0].GetComponent<SpriteRenderer>().color;
+        movingDot.GetComponent<RandomMovement>().isSignalDot = willBeSignalDot;
+    }
+
     private void updateNumbers()
     {
         redDotsNubmer = redDots.Count;
@@ -167,6 +244,18 @@ public class GameMaster : MonoBehaviour {
     {
         SetBluesColor(col);
         SetRedsColor(col);
+    }
+
+    void DeleteAllDots()
+    {
+        foreach (GameObject tmp in redDots)
+        {
+            Destroy(tmp);
+        }
+        foreach (GameObject tmp in blueDots)
+        {
+            Destroy(tmp);
+        }
     }
 }
 

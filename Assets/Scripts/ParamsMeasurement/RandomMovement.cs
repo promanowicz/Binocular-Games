@@ -9,6 +9,7 @@ public class RandomMovement : MonoBehaviour {
     public bool isSignalDot;
     private float startTime;
     private float distance;
+
 	// Use this for initialization
 	void Start () {
         lastPosition = transform.position;
@@ -30,7 +31,7 @@ public class RandomMovement : MonoBehaviour {
 
     void SetUpJourney(Vector3 lastpos)
     {
-        float dist = Settings.instance.signalMoveDistance;
+        float signalMoveDistance = Settings.instance.signalMoveDistance;
         if (!isSignalDot) {
         lastPosition = Settings.instance.GetValidPosition();
         nextPosition = Settings.instance.GetValidPosition();
@@ -38,18 +39,18 @@ public class RandomMovement : MonoBehaviour {
         else
         {
             Vector3 trans = new Vector3();
-            trans = Settings.instance.GetValidPosition();
+            trans = Settings.instance.GetShorterValidPosition();
             lastPosition = trans;
             nextPosition = trans;
             switch (Settings.instance.GetDirection())
             {
                 case Direction.Left:
-                    lastPosition.x += dist ;
-                    nextPosition.x = nextPosition.x - dist;
+                    lastPosition.x += signalMoveDistance ;
+                    nextPosition.x = nextPosition.x - signalMoveDistance;
                     break;
                 case Direction.Right:
-                    lastPosition.x -= dist ;
-                    nextPosition.x = nextPosition.x + dist;
+                    lastPosition.x -= signalMoveDistance ;
+                    nextPosition.x = nextPosition.x + signalMoveDistance;
                     break;
             }
         }
