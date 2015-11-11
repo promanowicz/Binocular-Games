@@ -9,7 +9,7 @@ public class GameMaster : MonoBehaviour {
     public GameObject dotPrefab;
     public List<GameObject> redDots = new List<GameObject>();
     public List<GameObject> blueDots = new List<GameObject>();
-    private List<int> measuremens = new List<int>();
+    private List<int> measurementsRed = new List<int>();
     public GameObject[] BackGround;
     public int redDotsNubmer =50;
     public int blueDotsNumber=50;
@@ -17,11 +17,10 @@ public class GameMaster : MonoBehaviour {
     public float contrastIncFactor;
     public int tresholdIncFactor;
     public float timer = 300;
-    public float timerReset = 300;
+    public float timerResetValue = 180;
+    public float resetTime = 10;
 	// Use this for initialization
 	void Start () {
-        redDotsNubmer =50;
-        blueDotsNumber=50;
         if (gameType == GameType.ContrastMeasurement)
         {
             RestoreValues();
@@ -29,18 +28,42 @@ public class GameMaster : MonoBehaviour {
         setUpGame();
 	}
 
+    bool isAdded = false;
     void Update()
     {
         timer -= Time.deltaTime;
 
         if (timer <= 0)
         {
-            //destroy objects
-            setUpGame();
-            timer = timerReset;
+            if (!isAdded) {
+                isAdded = true;
+                 measurementsRed.Add(redDots.Count);
+            }
+            if (measurementsRed.Count >= 5 )
+            {
+                Settings.instance.RedDotsNumber = average(measurementsRed);
+                Settings.instance.SavePlayerPrefs();
+                Debug.Log("NEW SCENE");
+                //TODO: load new scene
+            }
+            DeleteAllDots();
+            redDotsNubmer = 50;
+            blueDotsNumber = 50;
+            //monit o resetowaniu gry
+            if (timer < -resetTime) {
+                isAdded = false;
+               setUpGame();
+               timer = timerResetValue;
+            }
         }
-        //TODO: Timer 3 minutowy na sesję pobierania progu
-        //TODO: 5 sesji z których średnia jest podstawą do pomiaru kontrastu
+    }
+
+    int average(List<int> list)
+    {
+        int tmp = 0;
+        foreach (int x in list) tmp += x;
+        tmp /= list.Count;
+        return tmp;
     }
 
     void RestoreValues()
@@ -248,14 +271,17 @@ public class GameMaster : MonoBehaviour {
 
     void DeleteAllDots()
     {
-        foreach (GameObject tmp in redDots)
-        {
-            Destroy(tmp);
-        }
-        foreach (GameObject tmp in blueDots)
-        {
-            Destroy(tmp);
-        }
+            foreach (GameObject tmp in redDots)
+            {
+                Destroy(tmp);
+            }
+            foreach (GameObject tmp in blueDots)
+            {
+                Destroy(tmp);
+            }
+
+            redDots.Clear();
+            blueDots.Clear();
     }
 }
 

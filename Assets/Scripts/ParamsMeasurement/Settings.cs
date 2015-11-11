@@ -46,14 +46,14 @@ public class Settings : MonoBehaviour {
         direction = (Direction)Random.Range(0, 2);
         return direction;
     }
-    void SavePlayerPrefs()
+    public void SavePlayerPrefs()
     {
         PlayerPrefs.SetInt(WHICH_EYE, (int)ambylopicEye);
         PlayerPrefs.SetFloat(CONTRAST, contrast);
         PlayerPrefs.SetInt(BLUE_DOTS_NUMBER, blueDotsNumber);
         PlayerPrefs.SetInt(RED_DOTS_NUMBER, redDotsNumber);
     }
-    void RestorePrefs()
+    public void RestorePrefs()
     {
         if (PlayerPrefs.HasKey(WHICH_EYE))
         {
